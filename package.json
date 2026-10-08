@@ -1,0 +1,10 @@
+{
+  "name": "youtube-to-twitch-chat",
+  "version": "1.2.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "lint": "node --check extension/shared.js && node --check extension/content.js && node --check extension/popup.js && node --check extension/background.js && node --check extension/connect.js",
+    "build": "node scripts/build.cjs"
+  }
+}

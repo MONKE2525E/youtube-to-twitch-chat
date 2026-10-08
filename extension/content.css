@@ -1,0 +1,32 @@
+ytd-live-chat-frame[data-yttc-host] > :not(#yttc-panel) { display: none !important; }
+#yttc-panel { --yttc-bg: #18181b; --yttc-fg: #efeff1; --yttc-line: #38383f; --yttc-muted: #adadb8; display: flex; flex-direction: column; height: 100%; min-height: 500px; width: 100%; overflow: hidden; box-sizing: border-box; background: var(--yttc-bg); color: var(--yttc-fg); border: 1px solid var(--yttc-line); border-radius: 12px; font: 13px/1.45 Arial, sans-serif; }
+#yttc-panel[data-theme="light"] { --yttc-bg: #fff; --yttc-fg: #18181b; --yttc-line: #dedee3; --yttc-muted: #60606b; }
+#yttc-panel.yttc-fallback { height: clamp(500px, 75vh, 850px); margin-bottom: 16px; }
+#yttc-panel * { box-sizing: border-box; }
+#yttc-panel button { border: 1px solid var(--yttc-line); border-radius: 6px; padding: 6px 9px; color: var(--yttc-fg); background: transparent; font: inherit; cursor: pointer; }
+#yttc-panel button:hover { background: var(--yttc-line); }
+#yttc-panel button:disabled { opacity: .45; cursor: default; }
+#yttc-panel :is(button, input, summary):focus-visible { outline: 2px solid #bf94ff; outline-offset: 2px; }
+#yttc-panel form { padding: 10px 12px 0; }
+#yttc-panel label { display: block; margin-bottom: 5px; font-size: 12px; color: var(--yttc-muted); }
+#yttc-panel .yttc-field { display: flex; gap: 6px; }
+#yttc-panel input { width: 100%; min-width: 0; padding: 7px 9px; color: var(--yttc-fg); background: var(--yttc-bg); border: 1px solid var(--yttc-line); border-radius: 6px; font: inherit; }
+#yttc-panel button[type="submit"] { background: #9146ff; color: #fff; border-color: #9146ff; }
+#yttc-panel .yttc-error { color: #ee7b7b; margin: 5px 0; font-size: 12px; }
+#yttc-panel .yttc-error:empty { display: none; }
+#yttc-panel nav { display: flex; flex-wrap: wrap; gap: 6px; padding: 9px 12px; }
+#yttc-panel nav button { font-size: 12px; }
+#yttc-panel .yttc-body { flex: 1; min-height: 240px; position: relative; }
+#yttc-panel iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+#yttc-panel .yttc-empty { align-self: center; padding: 32px 24px; }
+#yttc-panel .yttc-empty strong { font-size: 18px; }
+#yttc-panel .yttc-empty p { margin-top: 10px; color: var(--yttc-muted); }
+#yttc-panel .yttc-settings { flex: none; border-bottom: 1px solid var(--yttc-line); }
+#yttc-panel .yttc-settings > summary { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 12px; cursor: pointer; list-style: none; }
+#yttc-panel summary::-webkit-details-marker { display: none; }
+#yttc-panel summary strong { font-size: 14px; }
+#yttc-panel .yttc-settings-label { margin-left: auto; color: var(--yttc-muted); font-size: 12px; }
+#yttc-panel .yttc-chevron { color: var(--yttc-muted); font-size: 16px; }
+#yttc-panel .yttc-settings[open] .yttc-chevron { transform: rotate(180deg); }
+#yttc-panel .yttc-owner, #yttc-panel .yttc-hint { font-size: 12px; color: var(--yttc-muted); margin: 6px 0 0; }
+#yttc-panel .yttc-hint { margin: 0; padding: 0 12px 12px; }

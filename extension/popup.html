@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>YouTube to Twitch Chat</title><link rel="stylesheet" href="popup.css"></head>
+<body>
+  <h1>YouTube to Twitch Chat</h1>
+  <p>Keep the video. Switch the conversation.</p>
+  <p id="youtube-channel"></p>
+  <form id="settings">
+    <label class="toggle"><input id="enabled" type="checkbox"> Replace YouTube chat</label>
+    <label for="channel">Twitch stream link or channel</label>
+    <input id="channel" type="text" placeholder="Paste a Twitch stream link" autocomplete="off" spellcheck="false">
+    <label class="toggle"><input id="dark" type="checkbox"> Dark chat</label>
+    <button type="submit">Save settings</button>
+    <p id="status" role="status" aria-live="polite"></p>
+  </form>
+  <button id="save-global" type="button" hidden>Save display settings</button>
+  <button id="connect-login" type="button">Twitch login settings</button>
+  <p class="hint">Twitch storage connects automatically. Use this page to restore or remove that connection.</p>
+  <script src="shared.js"></script><script src="popup.js"></script>
+</body>
+</html>

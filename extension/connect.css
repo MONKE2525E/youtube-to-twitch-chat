@@ -1,0 +1,12 @@
+:root { color-scheme: dark; background: #18181b; color: #efeff1; font: 16px/1.55 Arial, sans-serif; }
+body { margin: 0; padding: 48px 20px; }
+main { max-width: 520px; margin: auto; }
+h1 { font-size: 28px; line-height: 1.25; margin: 0 0 20px; }
+p { color: #adadb8; }
+button { padding: 10px 14px; border-radius: 6px; background: transparent; border: 1px solid #53535f; color: #efeff1; font: inherit; cursor: pointer; }
+#connect { background: #9146ff; border-color: #9146ff; margin: 12px 0; }
+button:disabled { opacity: .5; cursor: default; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+#status { min-height: 24px; color: #efeff1; }
+.hint { font-size: 14px; margin: 24px 0; }
+:focus-visible { outline: 2px solid #bf94ff; outline-offset: 3px; }
