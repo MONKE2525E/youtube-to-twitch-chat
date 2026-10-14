@@ -1,44 +1,80 @@
 # YouTube to Twitch Chat
 
-A Manifest V3 extension for Chrome, Chromium, Edge, and Brave. It places Twitch's official chat in YouTube's chat panel. On watch pages without a YouTube chat panel, it adds chat above the recommended videos.
+A Manifest V3 browser extension that shows Twitch's official chat in place of YouTube's chat on desktop YouTube. It's useful when a creator streams on both platforms and their Twitch chat is the one worth reading.
 
-## Install
+Twitch handles sign-in and sending messages. The extension only embeds Twitch's chat and remembers which Twitch channel belongs to which YouTube creator. It never touches the video player.
 
-1. Extract `youtube-to-twitch-chat.zip` to a folder you will keep.
-2. Open `chrome://extensions` or `edge://extensions`.
-3. Turn on **Developer mode**, choose **Load unpacked**, and select the extracted folder containing `manifest.json`. If using this source checkout, select `extension/`.
-4. Refresh an existing YouTube tab. Open the extension's toolbar popup or use the channel field beside the video. Enter a Twitch channel name or channel URL.
+Works in Chrome, Chromium, Edge, and Brave. Firefox and mobile YouTube are not supported.
 
-Each YouTube channel remembers its own Twitch chat link. The extension uses the YouTube channel ID when available and also saves its handle as an alias. A channel you have not linked starts with the setup dropdown open. After you paste a Twitch link, the dropdown closes; it remains closed when you return to that YouTube channel. Open **Settings** in the compact header to change a saved link.
+## Features
 
-When upgrading from the earlier version, the last selected Twitch chat is saved for the first YouTube channel you visit after reloading the extension. Other YouTube channels start unlinked.
+- Replaces the YouTube chat panel with Twitch chat. On watch pages without a chat panel, it adds chat above the recommended videos.
+- Links one Twitch channel per YouTube creator, keyed by YouTube channel ID with the handle kept as an alias. A creator you haven't linked never shows another creator's chat.
+- Accepts a channel name or any Twitch stream link, including mobile and chat pop-out URLs. VOD and directory links are rejected because they don't identify a live channel.
+- Follows YouTube's in-page navigation and browser Back without a refresh.
+- Switch back to YouTube's own chat at any time, or pop Twitch chat out into its own tab.
 
-## Sign in and send messages
+## Install from source
 
-Twitch storage access is configured automatically when the extension loads. The browser handles approval of the required site-settings permission during installation or update. The extension allows Twitch cookies specifically while Twitch is embedded on desktop YouTube. It does not read, store, or transfer your Twitch token.
+There is no store listing yet, so load the extension unpacked:
 
-If you aren't signed in yet, open **Settings** in the chat header, choose **Sign in**, complete Twitch's normal login, then return and choose **Reload**. Use Twitch's own message box to send messages. Subscriber-only, follower-only, verification, and moderation restrictions still apply.
+1. Clone this repository: `git clone https://github.com/MONKE2525E/youtube-to-twitch-chat.git`
+2. Open `chrome://extensions` (or `edge://extensions`, `brave://extensions`).
+3. Turn on **Developer mode**.
+4. Choose **Load unpacked** and select the `extension/` folder.
+5. Refresh any open YouTube tab.
 
-Use **Twitch login settings** in the extension popup to remove or restore Twitch storage access. Removing it also disables automatic connection until you explicitly restore it. Refresh YouTube after removing access. Browser policies and privacy tools may still prevent embedded login; **Pop out** opens chat in a regular Twitch tab.
+## Usage
 
-Paste a Twitch stream link into the panel or popup to select and open its chat immediately. Links with or without `https://`, mobile Twitch links, and Twitch chat pop-out URLs are accepted. Twitch VOD and directory URLs do not identify a live channel and are rejected.
+1. Open a YouTube video.
+2. In the chat panel's setup dropdown (or the toolbar popup), enter a Twitch channel name or paste a stream link. For a creator you haven't linked yet, the dropdown starts open. It closes once you save, and stays closed on later visits.
+3. Open **Settings** in the chat header to change or remove a link.
+4. To send messages, sign in through the embedded chat: choose **Sign in** in Settings, finish Twitch's normal login, return to YouTube, and choose **Reload**. Twitch's own restrictions (subscriber-only, follower-only, verification, moderation) still apply.
 
-Choose **YouTube chat** to restore the original panel. Re-enable replacement in the extension popup. The extension leaves the video player alone and responds to YouTube's navigation without requiring a page refresh after each video.
+If you used an earlier version, your last selected Twitch chat is assigned to the first YouTube creator you visit after updating. Other creators start unlinked.
 
-## Privacy and permissions
+## Permissions
 
-The required permissions are `storage` and `contentSettings`. The extension uses site settings only to allow Twitch cookies on desktop YouTube. Removing the connection or uninstalling the extension removes its cookie exceptions. Content scripts run on desktop YouTube. Stored settings include YouTube-to-Twitch channel links, the replacement toggle, theme, and whether automatic Twitch connection is enabled. No passwords, tokens, cookies, or chat messages are collected by the extension. Twitch serves the embedded chat and handles authentication and messages.
+| Permission | Why |
+| --- | --- |
+| `storage` | Saves your per-creator Twitch links, the replacement toggle, the theme, and the automatic-connection setting. |
+| `contentSettings` | Lets Twitch's embedded chat use its own cookies while it is embedded on desktop YouTube, so you can log in and chat. Browsers often block third-party cookies, which would otherwise leave the embed signed out. |
+| Content script on `youtube.com` | Draws the chat panel and reads the current channel from the page. |
+
+The cookie exception is scoped to Twitch embedded on `youtube.com`. It is not a general cookie override. The extension never reads your Twitch token or cookies, and it never sees your password. It does not collect chat messages or send data to any server of its own. Everything stays in your browser, and Twitch serves the embedded chat.
+
+Twitch access is set up automatically on install or update. To remove it, open **Twitch login settings** in the toolbar popup. Removing it clears the exceptions and turns automatic connection off until you restore it. Uninstalling the extension also removes them. If your browser policy or a privacy tool still blocks embedded login, use **Pop out** to chat in a regular Twitch tab.
 
 ## Development
 
-No dependencies or compilation are required. Node.js and `zip` are needed for these commands:
+There are no dependencies and nothing to compile. Node.js 18 or newer is needed for the checks, plus `zip` for packaging:
 
+```sh
+npm test         # unit tests for URL parsing and channel mapping
+npm run lint     # syntax check of every extension script
+npm run build    # writes dist/youtube-to-twitch-chat.zip
 ```
-npm test
-npm run lint
-npm run build
-```
 
-The ZIP contains only the loadable extension files. Twitch's embed format is documented at https://dev.twitch.tv/docs/embed/chat/.
+The ZIP contains only the loadable extension files.
 
-Firefox packaging and mobile YouTube are outside this version's scope.
+### Layout
+
+| Path | Role |
+| --- | --- |
+| `extension/content.js`, `content.css` | YouTube integration and the chat panel |
+| `extension/popup.*`, `connect.*` | Toolbar popup and Twitch connection page |
+| `extension/background.js` | Cookie exceptions, validated messages, serialized channel-link writes |
+| `extension/shared.js` | URL parsing, channel identity, defaults, embed URLs |
+| `tests/shared.test.cjs` | Tests for the pure functions in `shared.js` |
+
+Twitch's embed format is documented at <https://dev.twitch.tv/docs/embed/chat/>.
+
+## Contributing
+
+Issues and pull requests are welcome. Please run `npm test` and `npm run lint` before submitting, and check UI changes in a Chromium browser with the extension loaded unpacked.
+
+## License
+
+[MIT](LICENSE) © MONKE2525E
+
+This project is not affiliated with or endorsed by Google, YouTube, or Twitch.
