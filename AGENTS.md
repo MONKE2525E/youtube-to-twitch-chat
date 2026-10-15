@@ -19,4 +19,4 @@ This is a dependency-free Chromium Manifest V3 extension using plain JavaScript.
 
 - Run `npm test` for parser/mapping changes and `npm run lint` for JavaScript changes. Run `npm run build` for packaging changes; it requires Node.js and `zip` and writes `dist/youtube-to-twitch-chat.zip`.
 - Load `extension/` unpacked in Chromium for browser checks. For panel, navigation, or storage changes, verify two creators, return navigation, restart persistence, and automatic connection with third-party cookies blocked. Capture compact and expanded states for UI changes.
-- The user's delivery is the unpacked folder `/home/monke/Downloads/youtube-to-twitch-chat`, not a ZIP. When delivering an update, synchronize extension files and verify they match the source. Keep `package.json` and `extension/manifest.json` versions aligned.
+- Delivery is the unpacked `extension/` folder copied to the maintainer's install location (not a ZIP). When delivering an update, synchronize extension files and verify they match the source. Keep `package.json` and `extension/manifest.json` versions aligned.
