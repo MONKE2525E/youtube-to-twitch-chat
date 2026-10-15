@@ -1,2 +1,24 @@
+# Build output
 dist/
+*.zip
+
+# Dependencies
 node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment files
+.env
+.env.*
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Local agent state
+.claude/settings.local.json
