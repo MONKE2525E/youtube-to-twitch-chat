@@ -11,3 +11,7 @@ a { color: #bf94ff; }
 :focus-visible { outline: 2px solid #bf94ff; outline-offset: 3px; }
 #status { min-height: 21px; margin-bottom: 12px; color: #efeff1; }
 .hint { font-size: 12px; margin: 10px 0 0; }
+
+#diagnostics { margin-top: 16px; font-size: 12px; }
+#diagnostics summary { cursor: pointer; }
+#chat-report { box-sizing: border-box; width: 100%; min-height: 220px; resize: vertical; background: #0e0e10; color: #efeff1; border: 1px solid #53535f; padding: 8px; font: 12px/1.5 monospace; }

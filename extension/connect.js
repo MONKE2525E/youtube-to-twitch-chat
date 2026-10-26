@@ -16,7 +16,7 @@ connect.addEventListener('click', async () => {
       return;
     }
     await send('connect-session');
-    status.textContent = 'Twitch cookie access is enabled on YouTube. Your chat has been reloaded.';
+    status.textContent = 'Twitch cookie access is enabled on YouTube and X. Your chat has been reloaded.';
     document.getElementById('return').hidden = !Number.isInteger(sourceTab);
   } catch (error) {
     status.textContent = `${error.message}. Use Pop out if your browser continues to block the embedded login.`;
@@ -30,12 +30,12 @@ document.getElementById('login').addEventListener('click', async () => {
 });
 document.getElementById('return').addEventListener('click', async () => {
   try { await chrome.tabs.update(sourceTab, { active: true }); }
-  catch { status.textContent = 'Your YouTube tab has closed. Open a YouTube video to use chat.'; }
+  catch { status.textContent = 'Your video tab has closed. Open a YouTube video or X broadcast to use chat.'; }
 });
 document.getElementById('disconnect').addEventListener('click', async () => {
   try {
     await send('disconnect-session');
-    status.textContent = 'The extension\'s Twitch cookie exceptions have been removed. Refresh YouTube to reset chat.';
+    status.textContent = 'The extension\'s Twitch cookie exceptions have been removed. Refresh the video page to reset chat.';
     document.getElementById('return').hidden = !Number.isInteger(sourceTab);
   } catch (error) { status.textContent = error.message; }
 });

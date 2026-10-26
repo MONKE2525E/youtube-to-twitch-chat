@@ -29,3 +29,30 @@ test('channel identity prefers stable IDs and accepts handle aliases', () => {
   assert.equal(YTTC.linkedChannel(links, ['channel:second']), 'twitch');
   assert.equal(YTTC.linkedChannel(links, ['channel:third']), '');
 });
+test('X identities are namespaced, normalized, and limited to profile URLs', () => {
+  for (const input of ['/Theo', 'https://x.com/theo', 'https://twitter.com/THEO/']) {
+    assert.equal(YTTC.xChannelKey(input), 'x:handle:theo');
+  }
+  for (const input of ['/i/broadcasts/123', '/home', '/messages', '/theo/status/123', 'https://evil.test/theo', '/name-too-long-for-x']) {
+    assert.equal(YTTC.xChannelKey(input), '');
+  }
+  assert.equal(YTTC.linkedChannel({ 'handle:theo': 'youtubechat' }, ['x:handle:theo']), '');
+  const embed = new URL(YTTC.chatUrl('twitchdev', 'x.com', true));
+  assert.equal(embed.searchParams.get('parent'), 'x.com');
+});
+
+test('broadcast detection accepts live and upcoming streams but not replays or other videos', () => {
+  const now = Date.parse('2026-10-14T22:15:00Z');
+  const scope = (publication, id = 'https://www.youtube.com/watch?v=abc123') => ({ '@id': id, publication });
+  const live = { isLiveBroadcast: true, startDate: '2026-10-14T20:00:00Z' };
+  const upcoming = { isLiveBroadcast: true, startDate: '2026-10-14T22:30:00Z' };
+  const replay = { isLiveBroadcast: true, startDate: '2026-10-14T20:00:00Z', endDate: '2026-10-14T21:00:00Z' };
+  assert.equal(YTTC.liveBroadcast(scope(live), 'abc123', now), true);
+  assert.equal(YTTC.liveBroadcast(scope(upcoming), 'abc123', now), true);
+  assert.equal(YTTC.liveBroadcast(scope([replay, live]), 'abc123', now), true);
+  assert.equal(YTTC.liveBroadcast(scope(replay), 'abc123', now), false);
+  assert.equal(YTTC.liveBroadcast(scope(live), 'other999', now), false);
+  assert.equal(YTTC.liveBroadcast(scope(live, 'https://evil.test/watch?v=abc123'), 'abc123', now), false);
+  assert.equal(YTTC.liveBroadcast(scope(undefined), 'abc123', now), false);
+  assert.equal(YTTC.liveBroadcast(scope([{ isLiveBroadcast: false }]), 'abc123', now), false);
+});

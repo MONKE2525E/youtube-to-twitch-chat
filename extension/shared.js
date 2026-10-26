@@ -1,6 +1,16 @@
 /* Shared by the popup and content script. */
 (() => {
-  const defaults = { enabled: true, channel: '', dark: true, channelLinks: null, autoConnect: true };
+  const defaults = { enabled: true, channel: '', dark: true, channelLinks: null, xChannelLinks: {}, autoConnect: true };
+  const sourceHosts = ['www.youtube.com', 'youtube.com', 'x.com', 'www.x.com', 'twitter.com', 'www.twitter.com'];
+  function xChannelKey(value) {
+    try {
+      const url = new URL(value, 'https://x.com');
+      if (!['x.com', 'www.x.com', 'twitter.com', 'www.twitter.com'].includes(url.hostname)) return '';
+      const match = /^\/([a-z0-9_]{1,15})\/?$/i.exec(url.pathname);
+      if (!match || ['i', 'home', 'explore', 'search', 'notifications', 'messages', 'settings', 'compose', 'login', 'logout', 'signup', 'intent', 'share'].includes(match[1].toLowerCase())) return '';
+      return `x:handle:${match[1].toLowerCase()}`;
+    } catch { return ''; }
+  }
   function youtubeChannelKey(value) {
     try {
       const url = new URL(value, 'https://www.youtube.com');
@@ -17,6 +27,21 @@
       if (channel) return channel;
     }
     return '';
+  }
+  function liveBroadcast(metadata, video, now = Date.now()) {
+    if (!metadata || !video) return false;
+    try {
+      const url = new URL(metadata['@id'] || metadata.url || metadata.embedUrl);
+      const id = url.searchParams.get('v') || (url.pathname.startsWith('/embed/') ? url.pathname.split('/')[2] : '');
+      if (!['www.youtube.com', 'youtube.com'].includes(url.hostname) || id !== video) return false;
+    } catch { return false; }
+    const events = Array.isArray(metadata.publication) ? metadata.publication : [metadata.publication];
+    // Upcoming and live broadcasts have no past endDate; replays do.
+    return events.some(event => {
+      if (event?.isLiveBroadcast !== true) return false;
+      const end = event.endDate ? Date.parse(event.endDate) : Infinity;
+      return end > now;
+    });
   }
   function normalizeChannel(value) {
     const input = String(value).trim();
@@ -39,5 +64,5 @@
     if (dark) url.searchParams.set('darkpopout', 'true');
     return url.href;
   }
-  globalThis.YTTC = { defaults, normalizeChannel, chatUrl, youtubeChannelKey, linkedChannel };
+  globalThis.YTTC = { defaults, sourceHosts, normalizeChannel, chatUrl, youtubeChannelKey, xChannelKey, linkedChannel, liveBroadcast };
 })();

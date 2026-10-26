@@ -14,15 +14,15 @@ form.querySelector('button').disabled = true;
   if (info?.keys?.length) {
     const result = await chrome.runtime.sendMessage({ action: 'get-channel-settings', sourceTab });
     if (!result?.ok) throw new Error(result?.error);
-    fields.channel.value = YTTC.linkedChannel(result.settings.channelLinks, info.keys);
+    fields.channel.value = YTTC.linkedChannel((info.platform === 'x' ? result.settings.xChannelLinks : result.settings.channelLinks), info.keys);
     document.getElementById('youtube-channel').textContent = `Linked to ${info.name}`;
     form.querySelector('button').disabled = false;
   } else {
     fields.channel.disabled = true;
-    status.textContent = 'Open a YouTube video to edit its channel link.';
+    status.textContent = 'Open a YouTube video or X broadcast to edit its channel link.';
     document.getElementById('save-global').hidden = false;
   }
-})().catch(() => { status.textContent = 'Could not read settings. Reopen the extension on a YouTube video.'; });
+})().catch(() => { status.textContent = 'Could not read settings. Reopen the extension on a YouTube video or X broadcast.'; });
 async function saveGlobalSettings() {
   await chrome.storage.local.set({ enabled: fields.enabled.checked, dark: fields.dark.checked });
   status.textContent = 'Settings saved.';
@@ -36,7 +36,7 @@ form.addEventListener('submit', async event => {
     const result = await chrome.runtime.sendMessage({ action: 'save-channel-link', sourceTab, channel, enabled: fields.enabled.checked, dark: fields.dark.checked });
     if (!result?.ok) throw new Error(result?.error || 'Could not save settings');
     fields.channel.value = channel;
-    status.textContent = channel ? 'Saved for this YouTube channel.' : 'Channel link removed.';
+    status.textContent = channel ? 'Saved for this creator.' : 'Channel link removed.';
   } catch (error) { status.textContent = error.message; }
 });
 fields.channel.addEventListener('paste', event => {
@@ -53,4 +53,13 @@ document.getElementById('connect-login').addEventListener('click', async () => {
     const result = await chrome.runtime.sendMessage({ action: 'open-twitch', kind: 'connect' });
     if (!result?.ok) throw new Error('Could not open connection page');
   } catch { status.textContent = 'Could not open connection page. Reload the extension and try again.'; }
+});
+
+document.getElementById('check-chat').addEventListener('click', async () => {
+  const report = document.getElementById('chat-report');
+  report.hidden = false;
+  try {
+    const info = await chrome.tabs.sendMessage(sourceTab, { action: 'get-chat-diagnostics' });
+    report.value = info ? JSON.stringify(info, null, 2) : 'Refresh the X tab, then check again. Its content script predates this diagnostic.';
+  } catch { report.value = 'No content script answered. Refresh the X tab and check that the extension has access to this site.'; }
 });

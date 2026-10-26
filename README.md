@@ -1,18 +1,20 @@
 # YouTube to Twitch Chat
 
-A Manifest V3 browser extension that shows Twitch's official chat in place of YouTube's chat on desktop YouTube. It's useful when a creator streams on both platforms and their Twitch chat is the one worth reading.
+A Manifest V3 browser extension that shows Twitch's official chat in place of the native chat on desktop YouTube and X broadcasts. It's useful when a creator streams on both platforms and their Twitch chat is the one worth reading.
 
-Twitch handles sign-in and sending messages. The extension only embeds Twitch's chat and remembers which Twitch channel belongs to which YouTube creator. It never touches the video player.
+Twitch handles sign-in and sending messages. The extension only embeds Twitch's chat and remembers which Twitch channel belongs to which YouTube creator or X broadcaster. It never touches the video player.
 
-Works in Chrome, Chromium, Edge, and Brave. Firefox and mobile YouTube are not supported.
+Works in Chrome, Chromium, Edge, and Brave. Firefox and mobile sites are not supported.
 
 ## Features
 
-- Replaces the YouTube chat panel with Twitch chat. On watch pages without a chat panel, it adds chat above the recommended videos.
+- Replaces YouTube and X broadcast chat panels with Twitch chat. On live or upcoming YouTube watch pages without a chat panel, it adds chat above the recommended videos. Regular uploads and ended YouTube broadcasts keep their normal layout.
 - Links one Twitch channel per YouTube creator, keyed by YouTube channel ID with the handle kept as an alias. A creator you haven't linked never shows another creator's chat.
 - Accepts a channel name or any Twitch stream link, including mobile and chat pop-out URLs. VOD and directory links are rejected because they don't identify a live channel.
-- Follows YouTube's in-page navigation and browser Back without a refresh.
-- Switch back to YouTube's own chat at any time, or pop Twitch chat out into its own tab.
+- Saves X links separately by broadcaster handle; YouTube links and legacy migration stay separate. Supports `x.com/i/broadcasts/…` and `twitter.com/i/broadcasts/…`.
+- Follows YouTube and X in-page navigation and browser Back without a refresh.
+- Hide or show the Twitch panel with the chat header button.
+- Switch back to the site's own chat at any time, or pop Twitch chat out into its own tab.
 
 ## Install from source
 
@@ -22,14 +24,14 @@ There is no store listing yet, so load the extension unpacked:
 2. Open `chrome://extensions` (or `edge://extensions`, `brave://extensions`).
 3. Turn on **Developer mode**.
 4. Choose **Load unpacked** and select the `extension/` folder.
-5. Refresh any open YouTube tab.
+5. Refresh any open YouTube or X broadcast tab.
 
 ## Usage
 
-1. Open a YouTube video.
+1. Open a live or upcoming YouTube stream, or an X broadcast.
 2. In the chat panel's setup dropdown (or the toolbar popup), enter a Twitch channel name or paste a stream link. For a creator you haven't linked yet, the dropdown starts open. It closes once you save, and stays closed on later visits.
 3. Open **Settings** in the chat header to change or remove a link.
-4. To send messages, sign in through the embedded chat: choose **Sign in** in Settings, finish Twitch's normal login, return to YouTube, and choose **Reload**. Twitch's own restrictions (subscriber-only, follower-only, verification, moderation) still apply.
+4. To send messages, sign in through the embedded chat: choose **Sign in** in Settings, finish Twitch's normal login, return to the video, and choose **Reload**. Twitch's own restrictions (subscriber-only, follower-only, verification, moderation) still apply.
 
 If you used an earlier version, your last selected Twitch chat is assigned to the first YouTube creator you visit after updating. Other creators start unlinked.
 
@@ -38,10 +40,10 @@ If you used an earlier version, your last selected Twitch chat is assigned to th
 | Permission | Why |
 | --- | --- |
 | `storage` | Saves your per-creator Twitch links, the replacement toggle, the theme, and the automatic-connection setting. |
-| `contentSettings` | Lets Twitch's embedded chat use its own cookies while it is embedded on desktop YouTube, so you can log in and chat. Browsers often block third-party cookies, which would otherwise leave the embed signed out. |
-| Content script on `youtube.com` | Draws the chat panel and reads the current channel from the page. |
+| `contentSettings` | Lets Twitch's embedded chat use its own cookies while it is embedded on desktop YouTube or X, so you can log in and chat. Browsers often block third-party cookies, which would otherwise leave the embed signed out. |
+| Content scripts on `youtube.com`, `x.com`, and `twitter.com` | Draws the chat panel and reads the current channel from the page. |
 
-The cookie exception is scoped to Twitch embedded on `youtube.com`. It is not a general cookie override. The extension never reads your Twitch token or cookies, and it never sees your password. It does not collect chat messages or send data to any server of its own. Everything stays in your browser, and Twitch serves the embedded chat.
+The cookie exception is scoped to Twitch embedded on desktop `youtube.com`, `x.com`, and `twitter.com` (including their `www` hosts). It is not a general cookie override. The extension never reads your Twitch token or cookies, and it never sees your password. It does not collect chat messages or send data to any server of its own. Everything stays in your browser, and Twitch serves the embedded chat.
 
 Twitch access is set up automatically on install or update. To remove it, open **Twitch login settings** in the toolbar popup. Removing it clears the exceptions and turns automatic connection off until you restore it. Uninstalling the extension also removes them. If your browser policy or a privacy tool still blocks embedded login, use **Pop out** to chat in a regular Twitch tab.
 
@@ -61,7 +63,7 @@ The ZIP contains only the loadable extension files.
 
 | Path | Role |
 | --- | --- |
-| `extension/content.js`, `content.css` | YouTube integration and the chat panel |
+| `extension/content.js`, `content.css` | YouTube/X integration and the chat panel |
 | `extension/popup.*`, `connect.*` | Toolbar popup and Twitch connection page |
 | `extension/background.js` | Cookie exceptions, validated messages, serialized channel-link writes |
 | `extension/shared.js` | URL parsing, channel identity, defaults, embed URLs |

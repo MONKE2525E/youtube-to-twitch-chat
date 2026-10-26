@@ -24,9 +24,21 @@ ytd-live-chat-frame[data-yttc-host] > :not(#yttc-panel) { display: none !importa
 #yttc-panel .yttc-settings { flex: none; border-bottom: 1px solid var(--yttc-line); }
 #yttc-panel .yttc-settings > summary { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 12px; cursor: pointer; list-style: none; }
 #yttc-panel summary::-webkit-details-marker { display: none; }
-#yttc-panel summary strong { font-size: 14px; }
-#yttc-panel .yttc-settings-label { margin-left: auto; color: var(--yttc-muted); font-size: 12px; }
+#yttc-panel .yttc-settings-label { margin-right: auto; color: var(--yttc-muted); font-size: 12px; }
 #yttc-panel .yttc-chevron { color: var(--yttc-muted); font-size: 16px; }
 #yttc-panel .yttc-settings[open] .yttc-chevron { transform: rotate(180deg); }
 #yttc-panel .yttc-owner, #yttc-panel .yttc-hint { font-size: 12px; color: var(--yttc-muted); margin: 6px 0 0; }
 #yttc-panel .yttc-hint { margin: 0; padding: 0 12px 12px; }
+
+[data-yttc-host="x"] { position: relative; }
+[data-yttc-host="x"] > :not(#yttc-panel) { visibility: hidden !important; pointer-events: none !important; }
+[data-yttc-host="x"] > #yttc-panel { position: absolute; inset: 0; min-height: 0; border-radius: 0; }
+
+#yttc-panel .yttc-bar { flex: none; display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 12px; border-bottom: 1px solid var(--yttc-line); }
+#yttc-panel .yttc-bar strong { font-size: 14px; }
+#yttc-panel .yttc-collapse { margin-left: auto; font-size: 12px; }
+#yttc-panel .yttc-content { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+#yttc-panel .yttc-content[hidden] { display: none; }
+#yttc-panel.yttc-collapsed { flex: none; height: auto; min-height: 0; }
+#yttc-panel.yttc-collapsed .yttc-bar { border-bottom: 0; }
+ytd-live-chat-frame[data-yttc-host][data-yttc-collapsed] { height: auto !important; min-height: 0 !important; max-height: none !important; flex: none !important; }
