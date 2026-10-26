@@ -8,10 +8,10 @@ function queued(work) {
 function isExtensionPage(sender) {
   return sender.id === chrome.runtime.id && sender.url?.startsWith(chrome.runtime.getURL(''));
 }
-function isYouTube(sender) {
+function isSource(sender) {
   try {
     const url = new URL(sender.url);
-    return sender.id === chrome.runtime.id && url.protocol === 'https:' && ['www.youtube.com', 'youtube.com'].includes(url.hostname);
+    return sender.id === chrome.runtime.id && url.protocol === 'https:' && YTTC.sourceHosts.includes(url.hostname);
   } catch { return false; }
 }
 async function reloadChats() {
@@ -20,13 +20,13 @@ async function reloadChats() {
 async function ensureSession(force = false) {
   const { autoConnect } = await chrome.storage.local.get({ autoConnect: true });
   if (!force && !autoConnect) return;
-  if (!await chrome.permissions.contains({ permissions: ['contentSettings'] })) throw new Error('Approve the extension\'s site-settings permission in your browser, then refresh YouTube');
+  if (!await chrome.permissions.contains({ permissions: ['contentSettings'] })) throw new Error('Approve the extension\'s site-settings permission in your browser, then refresh the video page');
   try {
-    for (const youtube of ['www.youtube.com', 'youtube.com']) {
-      await chrome.contentSettings.cookies.set({ primaryPattern: 'https://*.twitch.tv/*', secondaryPattern: `https://${youtube}/*`, setting: 'allow', scope: 'regular' });
+    for (const source of YTTC.sourceHosts) {
+      await chrome.contentSettings.cookies.set({ primaryPattern: 'https://*.twitch.tv/*', secondaryPattern: `https://${source}/*`, setting: 'allow', scope: 'regular' });
     }
-    for (const youtube of ['www.youtube.com', 'youtube.com']) {
-      const result = await chrome.contentSettings.cookies.get({ primaryUrl: 'https://www.twitch.tv/', secondaryUrl: `https://${youtube}/` });
+    for (const source of YTTC.sourceHosts) {
+      const result = await chrome.contentSettings.cookies.get({ primaryUrl: 'https://www.twitch.tv/', secondaryUrl: `https://${source}/` });
       if (result.setting !== 'allow') throw new Error('Your browser policy is blocking Twitch cookies. Use Pop out');
     }
   } catch (error) {
@@ -36,17 +36,18 @@ async function ensureSession(force = false) {
   if (force) await chrome.storage.local.set({ autoConnect: true });
 }
 async function sourceContext(sender, sourceTab) {
-  const tabId = isYouTube(sender) ? sender.tab?.id : sourceTab;
-  if (!Number.isInteger(tabId)) throw new Error('Open a YouTube video to save a channel link');
+  const tabId = isSource(sender) ? sender.tab?.id : sourceTab;
+  if (!Number.isInteger(tabId)) throw new Error('Open a YouTube video or X broadcast to save a channel link');
   const info = await chrome.tabs.sendMessage(tabId, { action: 'get-context' });
-  if (!info?.keys?.length) throw new Error('Wait for the YouTube channel to load, then try again');
+  if (!info?.keys?.length) throw new Error('Wait for the creator to load, then try again');
   return info;
 }
 async function channelSettings(sender, message) {
   return queued(async () => {
     const info = await sourceContext(sender, message.sourceTab);
     const settings = await chrome.storage.local.get(YTTC.defaults);
-    if (settings.channelLinks === null) {
+    const mapKey = info.keys.every(key => key.startsWith('x:')) ? 'xChannelLinks' : 'channelLinks';
+    if (mapKey === 'channelLinks' && settings.channelLinks === null) {
       settings.channelLinks = {};
       const previous = YTTC.normalizeChannel(settings.channel);
       if (previous) for (const key of info.keys) settings.channelLinks[key] = previous;
@@ -56,10 +57,11 @@ async function channelSettings(sender, message) {
       const channel = YTTC.normalizeChannel(message.channel || '');
       if (message.channel && !channel) throw new Error('Enter a Twitch channel name or stream link');
       for (const key of info.keys) {
-        if (channel) settings.channelLinks[key] = channel;
-        else delete settings.channelLinks[key];
+        if (channel) settings[mapKey][key] = channel;
+        else delete settings[mapKey][key];
       }
-      const values = { channelLinks: settings.channelLinks, channel };
+      const values = { [mapKey]: settings[mapKey] };
+      if (mapKey === 'channelLinks') values.channel = channel;
       if (typeof message.enabled === 'boolean') values.enabled = message.enabled;
       if (typeof message.dark === 'boolean') values.dark = message.dark;
       await chrome.storage.local.set(values);
@@ -69,14 +71,14 @@ async function channelSettings(sender, message) {
   });
 }
 async function handleMessage(message, sender) {
-  if (!isExtensionPage(sender) && !isYouTube(sender)) throw new Error('Unsupported sender');
+  if (!isExtensionPage(sender) && !isSource(sender)) throw new Error('Unsupported sender');
   if (['save-channel-link', 'get-channel-settings'].includes(message?.action)) return channelSettings(sender, message);
   if (message?.action === 'ensure-session') { await ensureSession(); return { ok: true }; }
   if (message?.action === 'open-twitch') {
     let url;
     if (message.kind === 'connect') {
       url = chrome.runtime.getURL('connect.html');
-      if (isYouTube(sender) && Number.isInteger(sender.tab?.id)) url += `?sourceTab=${sender.tab.id}`;
+      if (isSource(sender) && Number.isInteger(sender.tab?.id)) url += `?sourceTab=${sender.tab.id}`;
     } else if (message.kind === 'login') {
       await ensureSession();
       url = 'https://www.twitch.tv/login';

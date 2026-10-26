@@ -6,7 +6,7 @@
   <p>Keep the video. Switch the conversation.</p>
   <p id="youtube-channel"></p>
   <form id="settings">
-    <label class="toggle"><input id="enabled" type="checkbox"> Replace YouTube chat</label>
+    <label class="toggle"><input id="enabled" type="checkbox"> Replace YouTube / X chat</label>
     <label for="channel">Twitch stream link or channel</label>
     <input id="channel" type="text" placeholder="Paste a Twitch stream link" autocomplete="off" spellcheck="false">
     <label class="toggle"><input id="dark" type="checkbox"> Dark chat</label>
@@ -16,6 +16,7 @@
   <button id="save-global" type="button" hidden>Save display settings</button>
   <button id="connect-login" type="button">Twitch login settings</button>
   <p class="hint">Twitch storage connects automatically. Use this page to restore or remove that connection.</p>
+  <details id="diagnostics"><summary>Troubleshoot chat replacement</summary><button id="check-chat" type="button">Check this tab</button><textarea id="chat-report" readonly aria-label="Chat diagnostic report" hidden></textarea></details>
   <script src="shared.js"></script><script src="popup.js"></script>
 </body>
 </html>

@@ -1,13 +1,13 @@
 {
   "manifest_version": 3,
   "name": "YouTube to Twitch Chat",
-  "version": "1.2.0",
-  "description": "Use Twitch chat beside a YouTube video, with Twitch's own sign-in and message controls.",
+  "version": "1.3.3",
+  "description": "Use Twitch chat beside YouTube videos and X broadcasts, with Twitch's own sign-in and message controls.",
   "permissions": ["storage", "contentSettings"],
   "background": { "service_worker": "background.js" },
   "action": { "default_popup": "popup.html", "default_title": "YouTube to Twitch Chat" },
   "content_scripts": [{
-    "matches": ["https://www.youtube.com/*", "https://youtube.com/*"],
+    "matches": ["https://www.youtube.com/*", "https://youtube.com/*", "https://x.com/*", "https://www.x.com/*", "https://twitter.com/*", "https://www.twitter.com/*"],
     "js": ["shared.js", "content.js"],
     "css": ["content.css"],
     "run_at": "document_idle"
