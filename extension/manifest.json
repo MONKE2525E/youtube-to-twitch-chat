@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube to Twitch Chat",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Use Twitch chat beside YouTube videos and X broadcasts, with Twitch's own sign-in and message controls.",
   "permissions": ["storage", "contentSettings"],
   "background": { "service_worker": "background.js" },
