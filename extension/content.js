@@ -35,7 +35,7 @@
           a.href === owner.href && a.textContent.trim() === title);
         if (!nameMatches) { container = container.parentElement; continue; }
         const key = xChannelKey(owner.href);
-        return { keys: [key], name: owner.textContent.trim(), channel: linkedChannel(settings.xChannelLinks, [key]), platform: 'x' };
+        return { keys: [key], name: owner.textContent.trim(), platform: 'x' };
       }
       container = container.parentElement;
     }
@@ -60,7 +60,7 @@
     }
     return null;
   }
-  function context() {
+  function detectContext() {
     if (isX) return xContext();
     const video = new URLSearchParams(location.search).get('v');
     const watch = document.querySelector('ytd-watch-flexy');
@@ -71,7 +71,22 @@
     keys.sort((a, b) => Number(b.startsWith('channel:')) - Number(a.startsWith('channel:')));
     if (!keys.length) return null;
     const name = owner.querySelector('#channel-name a, #text a')?.textContent.trim() || 'this YouTube channel';
-    return { keys, name, channel: linkedChannel(settings.channelLinks, keys) };
+    return { keys, name };
+  }
+  // Detection can miss for a moment while the page re-renders. Keep the creator
+  // for the same page so the iframe and input stay put. A different broadcast or
+  // video, or a YouTube navigation, drops it, so no creator inherits another's chat.
+  let held = null;
+  function pageKey() {
+    return isX ? location.pathname : `${location.pathname}?v=${new URLSearchParams(location.search).get('v')}`;
+  }
+  function context() {
+    const page = pageKey();
+    const found = navigating ? null : detectContext();
+    if (found) held = { page, info: found };
+    else if (held && (navigating || held.page !== page)) held = null;
+    if (!held) return null;
+    return { ...held.info, channel: linkedChannel(isX ? settings.xChannelLinks : settings.channelLinks, held.info.keys) };
   }
   function selectedChannel() { return context()?.channel || ''; }
   function isLive() {
